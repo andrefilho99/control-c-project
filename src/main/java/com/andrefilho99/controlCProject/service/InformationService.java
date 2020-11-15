@@ -1,5 +1,7 @@
 package com.andrefilho99.controlCProject.service;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -82,4 +84,31 @@ public class InformationService {
 		
 		return information;
 	}
+	
+	public void confirmUse(String key) {
+		
+		Information information = informationRepository.findByKey(key);
+		
+		if (information.getIsLimited()) {
+			decrementInformation(information);
+		} else {
+		    Date date = new Date();
+			information.setLastUse(date);
+		}
+		
+	}
+	
+	private void decrementInformation(Information information) {
+		
+		int remainingUses = information.getRemainingUses();
+		
+		if (remainingUses <= 1) {
+			informationRepository.delete(information);
+		} else {
+			information.setRemainingUses(remainingUses--);
+		}	
+	}
+	
+	
+	
 }

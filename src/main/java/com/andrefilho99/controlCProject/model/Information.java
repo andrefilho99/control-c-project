@@ -1,5 +1,7 @@
 package com.andrefilho99.controlCProject.model;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,6 +9,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name="information", schema = "public")
@@ -29,6 +35,17 @@ public class Information {
 	
 	@Column(updatable = false)
 	private String masterKey;
+	
+	@Column(updatable = false)
+	private boolean isLimited;
+	
+	@Column(updatable = true)
+	private int remainingUses;
+	
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Temporal(TemporalType.TIMESTAMP)
+	@Column(updatable = false)
+	private Date lastUse;
 	
 	public Information() {}
 	
@@ -67,8 +84,33 @@ public class Information {
 	public String getMasterKey() {
 		return masterKey;
 	}
-
+	
 	public void setMasterKey(String masterKey) {
 		this.masterKey = masterKey;
 	}
+	
+	public void setIsLimited(boolean isLimited) {
+		this.isLimited = isLimited;
+	}
+	
+	public boolean getIsLimited() {
+		return isLimited;
+	}
+
+	public void setRemainingUses(int remainingUses) {
+		this.remainingUses = remainingUses;
+	}
+	
+	public int getRemainingUses() {
+		return remainingUses;
+	}
+	
+	public void setLastUse(Date lastUse) {
+		this.lastUse = lastUse;
+	}
+	
+	public Date getLastUse() {
+		return lastUse;
+	}
+	
 }

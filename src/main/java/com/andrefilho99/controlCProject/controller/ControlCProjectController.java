@@ -44,4 +44,9 @@ public class ControlCProjectController {
 			return e.getMessage();
 		}
 	}
+	
+	@GetMapping("check-use/{key}")
+	public void limitedByTime(@PathVariable String key) {
+		informationService.confirmUse(key);
+	}
 }
