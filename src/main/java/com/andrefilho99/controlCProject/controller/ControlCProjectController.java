@@ -1,5 +1,7 @@
 package com.andrefilho99.controlCProject.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,6 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.andrefilho99.controlCProject.model.Information;
+import com.andrefilho99.controlCProject.repository.InformationRepository;
 import com.andrefilho99.controlCProject.service.InformationService;
 import com.andrefilho99.controlCProject.service.MasterKeyService;
 
@@ -17,6 +21,9 @@ public class ControlCProjectController {
 	
 	@Autowired
 	private InformationService informationService;
+	
+	@Autowired
+	private InformationRepository informationRepository;
 	
 	@Autowired
 	private MasterKeyService masterKeyService;
@@ -34,6 +41,11 @@ public class ControlCProjectController {
 	@GetMapping("copy/{value}")
 	public String copy(@PathVariable String value) {
 		return informationService.save(value).getKey();
+	}
+	
+	@GetMapping("paste-key/{key}")
+	public List<Information> copyMasterKey(@PathVariable String key) {
+		return informationRepository.findByMasterKey(key);
 	}
 	
 	@GetMapping("paste/{key}")

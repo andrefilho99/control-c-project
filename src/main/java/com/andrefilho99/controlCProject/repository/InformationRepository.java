@@ -1,5 +1,7 @@
 package com.andrefilho99.controlCProject.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -14,4 +16,7 @@ public interface InformationRepository extends JpaRepository<Information, Intege
 	
 	@Query(value = "select * from information where key = ?1", nativeQuery=true)
 	public Information findByKey(String key);
+	
+	@Query(value = "select * from information where master_key = ?1", nativeQuery=true)
+	public List<Information> findByMasterKey(String masterKey);
 }
