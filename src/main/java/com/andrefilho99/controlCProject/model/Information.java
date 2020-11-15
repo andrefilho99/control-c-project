@@ -6,14 +6,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 @Entity
+@Table(name="information", schema = "public")
 public class Information {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_INFORMATION")
 	@SequenceGenerator(name = "SEQ_INFORMATION", sequenceName = "public.id_seq_information", allocationSize = 1, initialValue = 1)
-	@Column(name = "id")
+	@Column(name = "id_info")
 	private Integer id;
 	
 	@Column(updatable = false)
@@ -24,7 +26,10 @@ public class Information {
 	
 	@Column(updatable = false)
 	private String key;
-
+	
+	@Column(updatable = false)
+	private String masterKey;
+	
 	public Information() {}
 	
 	public Integer getId() {
@@ -57,5 +62,13 @@ public class Information {
 
 	public void setKey(String key) {
 		this.key = key;
+	}
+
+	public String getMasterKey() {
+		return masterKey;
+	}
+
+	public void setMasterKey(String masterKey) {
+		this.masterKey = masterKey;
 	}
 }

@@ -16,7 +16,7 @@ public class InformationService {
 	@Autowired
 	private HashUtils hashUtils;
 	
-	public String save(String value) {
+	public Information save(String value) {
 		
 		Information checkInformation = informationAlreadyExists(value);
 		
@@ -32,21 +32,44 @@ public class InformationService {
 			
 			informationRepository.save(information);
 			
-			return key;
+			return information;
 		} else {		
-			return checkInformation.getKey();
+			return checkInformation;
 		}
 	}
 	
-	public String getByKey(String key) {
+	public Information saveWithKey(String value, String masterKey) {
+		
+		Information checkInformation = informationAlreadyExists(value);
+		
+		if(checkInformation == null) {
+			
+			Information information = new Information();
+			String hash = hashUtils.stringToSha1(value);
+			String key = hash.substring(0, 6);
+			
+			information.setValue(value);
+			information.setHash(hash);
+			information.setKey(key);
+			information.setMasterKey(masterKey);
+			
+			informationRepository.save(information);
+			
+			return information;
+		} else {		
+			return checkInformation;
+		}
+	}
+	
+	public Information getByKey(String key) throws Exception{
 		
 		Information information = informationRepository.findByKey(key);
 		
 		if(information == null) {
-			return "This key doesn't correspond to any information";
+			throw new Exception("This key does not belong to any information.");
 		}
 		
-		return information.getValue();
+		return information;
 	}
 	
 	private Information informationAlreadyExists(String value) {
