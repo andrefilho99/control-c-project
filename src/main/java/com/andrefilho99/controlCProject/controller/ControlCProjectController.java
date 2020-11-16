@@ -27,8 +27,13 @@ public class ControlCProjectController {
 	}
 	
 	@GetMapping("copy-to-key/{key}/{value}")
-	public String copy(@PathVariable String key, @PathVariable String value) {
+	public String copyToKey(@PathVariable String key, @PathVariable String value) {
 		return masterKeyService.addInfo(key, value);
+	}
+	
+	@GetMapping("copy-limited/{value}")
+	public String copyLimited(@PathVariable String value) {
+		return informationService.saveLimited(value).getKey();
 	}
 	
 	@GetMapping("copy/{value}")

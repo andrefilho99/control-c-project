@@ -1,6 +1,8 @@
 package com.andrefilho99.controlCProject.service;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,23 @@ public class InformationService {
 		}
 	}
 	
+	public Information saveLimited(String value) {
+		
+		Information information = new Information();
+		String hash = hashUtils.stringToSha1(value);
+		String key = hash.substring(0, 6);
+		
+		information.setValue(value);
+		information.setHash(hash);
+		information.setKey(key);
+		information.setIsLimited(true);
+		information.setRemainingUses(5);
+		
+		informationRepository.save(information);
+		
+		return information;
+	}
+	
 	public Information saveWithKey(String value, String masterKey) {
 		
 		Information checkInformation = informationAlreadyExists(value);
@@ -63,9 +82,13 @@ public class InformationService {
 		}
 	}
 	
+	
+	
 	public Information getByKey(String key) throws Exception{
 		
 		Information information = informationRepository.findByKey(key);
+		
+		confirmUse(key);
 		
 		if(information == null) {
 			throw new Exception("This key does not belong to any information.");
@@ -109,6 +132,25 @@ public class InformationService {
 		}	
 	}
 	
+	public void clean() {
+		List<Information> infos = informationRepository.findAll();
+		
+		for(Information info : infos) {
+			
+			if(lastUseThreeDaysAgo(info)) {
+				informationRepository.delete(info);
+			}
+		}
+	}
 	
-	
+	public boolean lastUseThreeDaysAgo(Information info) {
+		
+		Calendar calendar = Calendar.getInstance();
+		
+		if(calendar.getTime().compareTo(info.getLastUse()) >= 3) {
+			return true;
+		}
+		
+		return false;
+	}
 }
