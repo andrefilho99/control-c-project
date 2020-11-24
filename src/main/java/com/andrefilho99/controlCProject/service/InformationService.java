@@ -7,7 +7,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.andrefilho99.controlCProject.exceptions.InformationNotFoundException;
 import com.andrefilho99.controlCProject.model.Information;
+import com.andrefilho99.controlCProject.model.MasterKey;
 import com.andrefilho99.controlCProject.repository.InformationRepository;
 import com.andrefilho99.controlCProject.utils.HashUtils;
 
@@ -18,7 +20,23 @@ public class InformationService {
 	private InformationRepository informationRepository;
 	
 	@Autowired
+	private MasterKeyService masterKeyService;
+	
+	@Autowired
 	private HashUtils hashUtils;
+	
+	private Information setInformation(String value) {
+		
+		Information information = new Information();
+		String hash = hashUtils.stringToSha1(value);
+		String key = hash.substring(0, 6);
+		
+		information.setValue(value);
+		information.setHash(hash);
+		information.setKey(key);
+		
+		return information;
+	}
 	
 	public Information save(String value) {
 		
@@ -26,14 +44,7 @@ public class InformationService {
 		
 		if(checkInformation == null) {
 			
-			Information information = new Information();
-			String hash = hashUtils.stringToSha1(value);
-			String key = hash.substring(0, 6);
-			
-			information.setValue(value);
-			information.setHash(hash);
-			information.setKey(key);
-			
+			Information information = setInformation(value);
 			informationRepository.save(information);
 			
 			return information;
@@ -44,13 +55,8 @@ public class InformationService {
 	
 	public Information saveLimited(String value) {
 		
-		Information information = new Information();
-		String hash = hashUtils.stringToSha1(value);
-		String key = hash.substring(0, 6);
+		Information information = setInformation(value);
 		
-		information.setValue(value);
-		information.setHash(hash);
-		information.setKey(key);
 		information.setIsLimited(true);
 		information.setRemainingUses(5);
 		
@@ -59,40 +65,29 @@ public class InformationService {
 		return information;
 	}
 	
-	public Information saveWithKey(String value, String masterKey) {
+	public Information saveWithKey(String value, String masterKey) throws Exception {
 		
-		Information checkInformation = informationAlreadyExists(value);
+		MasterKey checkMasterKey = masterKeyService.getMasterKey(masterKey);
+		Information information = setInformation(value);
 		
-		if(checkInformation == null) {
-			
-			Information information = new Information();
-			String hash = hashUtils.stringToSha1(value);
-			String key = hash.substring(0, 6);
-			
-			information.setValue(value);
-			information.setHash(hash);
-			information.setKey(key);
-			information.setMasterKey(masterKey);
-			
-			informationRepository.save(information);
-			
-			return information;
-		} else {		
-			return checkInformation;
-		}
+		information.setMasterKey(checkMasterKey);
+		
+		informationRepository.save(information);
+		
+		return information;
 	}
 	
 	
 	
-	public Information getByKey(String key) throws Exception{
+	public Information getByKey(String key) throws InformationNotFoundException{
 		
 		Information information = informationRepository.findByKey(key);
 		
-		confirmUse(key);
-		
 		if(information == null) {
-			throw new Exception("This key does not belong to any information.");
+			throw new InformationNotFoundException("The given key does not belong to any information.");
 		}
+		
+		confirmUse(information);
 		
 		return information;
 	}
@@ -108,9 +103,7 @@ public class InformationService {
 		return information;
 	}
 	
-	public void confirmUse(String key) {
-		
-		Information information = informationRepository.findByKey(key);
+	public void confirmUse(Information information) {
 		
 		if (information.getIsLimited()) {
 			decrementInformation(information);
@@ -118,18 +111,16 @@ public class InformationService {
 		    Date date = new Date();
 			information.setLastUse(date);
 		}
-		
 	}
 	
 	private void decrementInformation(Information information) {
 		
-		int remainingUses = information.getRemainingUses();
-		
-		if (remainingUses <= 1) {
+		if (information.getRemainingUses() <= 1) {
 			informationRepository.delete(information);
 		} else {
-			information.setRemainingUses(remainingUses--);
-		}	
+			information.setRemainingUses(information.getRemainingUses() - 1);
+			informationRepository.save(information);
+		}
 	}
 	
 	public void clean() {

@@ -5,7 +5,7 @@ import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.andrefilho99.controlCProject.model.Information;
+import com.andrefilho99.controlCProject.exceptions.MasterKeyNotFoundException;
 import com.andrefilho99.controlCProject.model.MasterKey;
 import com.andrefilho99.controlCProject.repository.MasterKeyRepository;
 import com.andrefilho99.controlCProject.utils.HashUtils;
@@ -15,9 +15,6 @@ public class MasterKeyService {
 	
 	@Autowired
 	private MasterKeyRepository masterKeyRepository;
-	
-	@Autowired
-	private InformationService informationService;
 	
 	@Autowired
 	private HashUtils hashUtils;
@@ -36,15 +33,14 @@ public class MasterKeyService {
 		return key;
 	}
 	
-	public String addInfo(String masterKey, String value){
+	public MasterKey getMasterKey(String key) throws MasterKeyNotFoundException{
 		
-		try {
-			Information info = informationService.saveWithKey(value, masterKey);
-			return info.getKey();
-		} catch (Exception e) {
-			e.printStackTrace();
+		MasterKey masterKey = masterKeyRepository.findByKey(key);
+		
+		if(masterKey == null) {
+			throw new MasterKeyNotFoundException("The given key does not belong to any Master Key.");
 		}
 		
-		return null;
+		return masterKey;
 	}
 }

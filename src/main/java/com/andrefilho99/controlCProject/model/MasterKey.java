@@ -1,10 +1,15 @@
 package com.andrefilho99.controlCProject.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -23,6 +28,9 @@ public class MasterKey {
 	
 	@Column(updatable = false)
 	private String label;
+	
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "masterKey")
+	private List<Information> infos = new ArrayList<Information>();
 	
 	public MasterKey() {}
 
@@ -48,5 +56,13 @@ public class MasterKey {
 
 	public void setLabel(String label) {
 		this.label = label;
+	}
+
+	public List<Information> getInfos() {
+		return infos;
+	}
+
+	public void setInfos(List<Information> infos) {
+		this.infos = infos;
 	}
 }

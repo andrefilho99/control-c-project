@@ -4,15 +4,20 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name="information", schema = "public")
@@ -33,11 +38,13 @@ public class Information {
 	@Column(updatable = false)
 	private String key;
 	
-	@Column(updatable = false)
-	private String masterKey;
+	@JsonIgnore
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name = "id_master_key")
+	private MasterKey masterKey;
 	
 	@Column(updatable = false)
-	private boolean isLimited;
+	private boolean isLimited = false;
 	
 	@Column(updatable = true)
 	private int remainingUses;
@@ -80,15 +87,15 @@ public class Information {
 	public void setKey(String key) {
 		this.key = key;
 	}
-
-	public String getMasterKey() {
+	
+	public MasterKey getMasterKey() {
 		return masterKey;
 	}
-	
-	public void setMasterKey(String masterKey) {
+
+	public void setMasterKey(MasterKey masterKey) {
 		this.masterKey = masterKey;
 	}
-	
+
 	public void setIsLimited(boolean isLimited) {
 		this.isLimited = isLimited;
 	}
@@ -112,5 +119,4 @@ public class Information {
 	public Date getLastUse() {
 		return lastUse;
 	}
-	
 }
