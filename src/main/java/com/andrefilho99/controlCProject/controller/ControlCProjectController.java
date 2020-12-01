@@ -16,7 +16,7 @@ import com.andrefilho99.controlCProject.service.InformationService;
 import com.andrefilho99.controlCProject.service.MasterKeyService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "https://copy-my-stuff.herokuapp.com/"})
 @RequestMapping("/")
 public class ControlCProjectController {
 	
